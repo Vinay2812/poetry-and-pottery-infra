@@ -1,0 +1,74 @@
+version: "5.0"
+
+services:
+  database:
+    image: pgvector/pgvector:pg17-trixie
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_DB: $DB_DATABASE
+    env_file:
+      - path: ../../poetry-and-pottery-api/.env.docker
+        required: true
+    networks:
+      - network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $DB_USER -d $DB_DATABASE"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../../poetry-and-pottery-api
+      dockerfile: ../poetry-and-pottery-infra/docker/Dockerfile.api
+      args:
+        NODE_ENV: docker
+        PORT: "5050"
+        DATABASE_URL: $DATABASE_URL
+    pull_policy: build
+    env_file:
+      - path: ../../poetry-and-pottery-api/.env.docker
+        required: true
+    networks:
+      - network
+    depends_on:
+      - database
+    ports:
+      - "5050:5050"
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ../../poetry-and-pottery
+      dockerfile: ../poetry-and-pottery-infra/docker/Dockerfile.client
+      network: host
+      args:
+        NODE_ENV: docker
+        DATABASE_URL: $DATABASE_URL
+        API_ENDPOINT: $API_ENDPOINT
+        NEXT_PUBLIC_DOMAIN: $NEXT_PUBLIC_DOMAIN
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+    pull_policy: build
+    depends_on:
+      - api
+    env_file:
+      - path: ../../poetry-and-pottery/.env.docker
+        required: true
+    networks:
+      - network
+    ports:
+      - "3005:3000"
+    restart: unless-stopped
+
+networks:
+  network:
+
+volumes:
+  postgres-data:
+    external: true
+    name: poetry-and-pottery_postgres-data
