@@ -37,7 +37,7 @@ ENV DATABASE_URL=${DATABASE_URL}
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/prisma/generated ./prisma/generated
 COPY . .
-RUN bun run build:docker
+RUN bun run build
 
 # Production image, copy all the files and run next
 FROM base AS runner

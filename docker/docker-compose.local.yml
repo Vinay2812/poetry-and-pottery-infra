@@ -47,6 +47,8 @@ services:
       context: ../../poetry-and-pottery
       dockerfile: ../poetry-and-pottery-infra/docker/Dockerfile.client
       network: host
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
       args:
         NODE_ENV: docker
         DATABASE_URL: $DATABASE_URL
