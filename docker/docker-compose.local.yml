@@ -42,30 +42,30 @@ services:
       - "5050:5050"
     restart: unless-stopped
 
-  client:
-    build:
-      context: ../../poetry-and-pottery
-      dockerfile: ../poetry-and-pottery-infra/docker/Dockerfile.client
-      network: host
-      extra_hosts:
-        - "host.docker.internal:host-gateway"
-      args:
-        NODE_ENV: docker
-        DATABASE_URL: $DATABASE_URL
-        API_ENDPOINT: $API_ENDPOINT
-        NEXT_PUBLIC_DOMAIN: $NEXT_PUBLIC_DOMAIN
-        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-    pull_policy: build
-    depends_on:
-      - api
-    env_file:
-      - path: ../../poetry-and-pottery/.env.docker
-        required: true
-    networks:
-      - network
-    ports:
-      - "3005:3000"
-    restart: unless-stopped
+  # client:
+  #   build:
+  #     context: ../../poetry-and-pottery
+  #     dockerfile: ../poetry-and-pottery-infra/docker/Dockerfile.client
+  #     network: host
+  #     extra_hosts:
+  #       - "host.docker.internal:host-gateway"
+  #     args:
+  #       NODE_ENV: docker
+  #       DATABASE_URL: $DATABASE_URL
+  #       API_ENDPOINT: $API_ENDPOINT
+  #       NEXT_PUBLIC_DOMAIN: $NEXT_PUBLIC_DOMAIN
+  #       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+  #   pull_policy: build
+  #   depends_on:
+  #     - api
+  #   env_file:
+  #     - path: ../../poetry-and-pottery/.env.docker
+  #       required: true
+  #   networks:
+  #     - network
+  #   ports:
+  #     - "3005:3000"
+  #   restart: unless-stopped
 
 networks:
   network:
